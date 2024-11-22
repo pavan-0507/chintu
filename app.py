@@ -1,21 +1,34 @@
-import Streamlit as st
-st.title("Thevenin's Theorem")
+import streamlit as st
 
-def output(vth,rth,rl):
-    il=vth/(rth+rl)
-    pl=il*il*rl
-    return il,pl
+# Define the function Gen_Eff
+def Gen_Eff(V, CL, IL, K, Rse, Ra):
+    # Calculate Core Loss (CUL)
+    CUL = (K * IL) ** 2 * (Rse + Ra)
 
-col1,col2=st.columns(2)
-with col1:
-    vth=st.number_input("Vth (V)", value=10)
-    rth=st.number_input("Rth (Ohms)", value=100)
-    rl=st.number_input("Rl (Ohms)", value=100)
-    compute=st.button("compute")
+    # Calculate Efficiency (Eff)
+    Eff = (K * V * IL - CL - CUL) / (K * V * IL) * 100
+    
+    return Eff, CUL
 
-with col2:
-    with st.container(border=True):
-        if compute:
-            il,pl=output(vth,rth,rl)
-            st.write(f"load current={il:.2f} A")
-            st.write(f"Load Power={pl:.2f} Watts")
+# Web Application Interface
+def main():
+    st.title("2205A21011-PS11")  # Change title to your roll number and problem statement number
+    st.write("calculate the efficiency of DC series motor in various loads")
+    # Input fields for the user to enter the values
+    V = st.number_input("Voltage (V)", value=230.0)  # Default voltage 220V
+    CL = st.number_input("Core Loss (CL) in Watts", value=100.0)  # Default core loss
+    IL = st.number_input("Full Load Current (IL) in Amps", value=15.0)  # Default current
+    K = st.number_input("Loading on Motor (K)", value=1)  # Default loading
+    Rse = st.number_input("Series Field Resistance (Rse) in Ohms", value=0.20)  # Default resistance
+    Ra = st.number_input("Armature Resistance (Ra) in Ohms", value=0.10)  # Default resistance
+
+    if st.button("Calculate Efficiency"):
+        # Calculate efficiency and core loss using the Gen_Eff function
+        Eff, CUL = Gen_Eff(V, CL, IL, K, Rse, Ra)
+
+        # Display results
+        st.write(f"**Efficiency of a DC series motor(%)**: {Eff:.2f}%")
+        st.write(f"**Core Loss (CUL) in Watts**: {CUL:.2f} W")
+
+if __name__ == "__main__":
+    main()
